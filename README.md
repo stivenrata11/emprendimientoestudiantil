@@ -222,7 +222,8 @@ Retorna estadísticas generales de la plataforma.
 
 ## 📸 Capturas de Pantalla
 
-*[/image.png]*
+### Página Principal
+   ![Página Principal](https://github.com/stivenrata11/emprendimientoestudiantil/issues/1#issue-3221014617)
 
 ## 🤝 Contribuir
 
