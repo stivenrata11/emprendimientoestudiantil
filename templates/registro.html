@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Emprendimiento - EmprendeUni</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/registro.css') }}">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader">
+            <div class="rocket-loader">
+                <i class="fas fa-rocket"></i>
+                <div class="rocket-trail"></div>
+            </div>
+            <div class="loading-text">Cargando formulario...</div>
+        </div>
+    </div>
+
+    <!-- Floating Elements -->
+    <div class="floating-elements">
+        <div class="floating-element" style="--delay: 0s; --duration: 20s;">📝</div>
+        <div class="floating-element" style="--delay: 5s; --duration: 25s;">📊</div>
+        <div class="floating-element" style="--delay: 10s; --duration: 30s;">💡</div>
+        <div class="floating-element" style="--delay: 15s; --duration: 22s;">🚀</div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <span class="logo-text">EmprendeUni</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="{{ url_for('index') }}" class="nav-link">
+                    <span class="nav-link-text">Inicio</span>
+                    <div class="nav-link-underline"></div>
+                </a>
+                <a href="{{ url_for('registro') }}" class="nav-link active">
+                    <span class="nav-link-text">Registrar</span>
+                    <div class="nav-link-underline"></div>
+                </a>
+                <a href="{{ url_for('lista') }}" class="nav-link">
+                    <span class="nav-link-text">Emprendimientos</span>
+                    <div class="nav-link-underline"></div>
+                </a>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                        <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <main class="main-content">
+        <div class="form-container">
+            <div class="form-header">
+                <h1 class="section-title">
+                    <span class="title-background">Registrar</span>
+                    <span class="title-foreground">Emprendimiento</span>
+                </h1>
+                <p class="section-subtitle">Completa la información de tu emprendimiento estudiantil</p>
+            </div>
+
+            <form id="registro-form" method="POST" novalidate>
+                <!-- Información del Emprendimiento -->
+                <div class="form-section active" id="section-info">
+                    <h2><i class="fas fa-lightbulb"></i> Información del Emprendimiento</h2>
+                    
+                    <div class="form-group">
+                        <label for="nombre">
+                            <i class="fas fa-signature"></i> Nombre del Emprendimiento *
+                        </label>
+                        <input type="text" id="nombre" name="nombre" required 
+                               value="{{ form_data.nombre if form_data else '' }}"
+                               placeholder="Ej: Mi Startup Innovadora">
+                        <div class="error-message" id="error-nombre"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion">
+                            <i class="fas fa-align-left"></i> Descripción *
+                        </label>
+                        <textarea id="descripcion" name="descripcion" rows="4" required
+                                  placeholder="Describe tu emprendimiento en 100-200 palabras">{{ form_data.descripcion if form_data else '' }}</textarea>
+                        <div class="error-message" id="error-descripcion"></div>
+                        <div class="char-counter"><span id="descripcion-counter">0</span>/200 caracteres</div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categoria">
+                                <i class="fas fa-tag"></i> Categoría *
+                            </label>
+                            <select id="categoria" name="categoria" required>
+                                <option value="">Selecciona una categoría</option>
+                                {% for cat in categorias %}
+                                <option value="{{ cat }}" 
+                                        {% if form_data and form_data.categoria == cat %}selected{% endif %}>
+                                    {{ cat }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="estado">
+                                <i class="fas fa-chart-line"></i> Estado Actual *
+                            </label>
+                            <select id="estado" name="estado" required>
+                                {% for est in estados %}
+                                <option value="{{ est }}"
+                                        {% if form_data and form_data.estado == est %}selected{% endif %}>
+                                    {{ est }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información del Estudiante -->
+                <div class="form-section" id="section-estudiante">
+                    <h2><i class="fas fa-user-graduate"></i> Información del Estudiante</h2>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="estudiante_nombre">
+                                <i class="fas fa-user"></i> Nombre Completo *
+                            </label>
+                            <input type="text" id="estudiante_nombre" name="estudiante_nombre" required
+                                   value="{{ form_data.estudiante_nombre if form_data else '' }}"
+                                   placeholder="Ej: Juan Pérez">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">
+                                <i class="fas fa-envelope"></i> Email *
+                            </label>
+                            <input type="email" id="email" name="email" required
+                                   value="{{ form_data.email if form_data else '' }}"
+                                   placeholder="ejemplo@universidad.edu">
+                            <div class="error-message" id="error-email"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="telefono">
+                                <i class="fas fa-phone"></i> Teléfono *
+                            </label>
+                            <input type="tel" id="telefono" name="telefono" required
+                                   value="{{ form_data.telefono if form_data else '' }}"
+                                   placeholder="+51 987 654 321">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="universidad">
+                                <i class="fas fa-university"></i> Universidad *
+                            </label>
+                            <input type="text" id="universidad" name="universidad" required
+                                   value="{{ form_data.universidad if form_data else '' }}"
+                                   placeholder="Nombre de tu universidad">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="carrera">
+                                <i class="fas fa-graduation-cap"></i> Carrera *
+                            </label>
+                            <input type="text" id="carrera" name="carrera" required
+                                   value="{{ form_data.carrera if form_data else '' }}"
+                                   placeholder="Tu carrera de estudio">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="semestre">
+                                <i class="fas fa-calendar-alt"></i> Semestre
+                            </label>
+                            <select id="semestre" name="semestre">
+                                {% for i in range(1, 11) %}
+                                <option value="{{ i }}"
+                                        {% if form_data and form_data.semestre == i|string %}selected{% endif %}>
+                                    {{ i }}° Semestre
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Redes Sociales y Contacto -->
+                <div class="form-section" id="section-redes">
+                    <h2><i class="fas fa-share-alt"></i> Redes Sociales y Contacto</h2>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="instagram"><i class="fab fa-instagram"></i> Instagram</label>
+                            <input type="url" id="instagram" name="instagram" 
+                                   placeholder="https://instagram.com/tu_usuario"
+                                   value="{{ form_data.instagram if form_data else '' }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="facebook"><i class="fab fa-facebook"></i> Facebook</label>
+                            <input type="url" id="facebook" name="facebook" 
+                                   placeholder="https://facebook.com/tu_pagina"
+                                   value="{{ form_data.facebook if form_data else '' }}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tiktok"><i class="fab fa-tiktok"></i> TikTok</label>
+                            <input type="url" id="tiktok" name="tiktok" 
+                                   placeholder="https://tiktok.com/@tu_usuario"
+                                   value="{{ form_data.tiktok if form_data else '' }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</label>
+                            <input type="tel" id="whatsapp" name="whatsapp" 
+                                   placeholder="+51987654321"
+                                   value="{{ form_data.whatsapp if form_data else '' }}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sitio_web"><i class="fas fa-globe"></i> Sitio Web</label>
+                        <input type="url" id="sitio_web" name="sitio_web" 
+                               placeholder="https://tu-sitio-web.com"
+                               value="{{ form_data.sitio_web if form_data else '' }}">
+                    </div>
+                </div>
+
+                <!-- Información Adicional -->
+                <div class="form-section" id="section-adicional">
+                    <h2><i class="fas fa-chart-line"></i> Información Adicional</h2>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="inversion_inicial">
+                                <i class="fas fa-coins"></i> Inversión Inicial (S/.)
+                            </label>
+                            <input type="number" id="inversion_inicial" name="inversion_inicial" min="0" step="0.01"
+                                   value="{{ form_data.inversion_inicial if form_data else '' }}"
+                                   placeholder="0.00">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="empleados">
+                                <i class="fas fa-users"></i> Número de Empleados
+                            </label>
+                            <input type="number" id="empleados" name="empleados" min="1" value="1"
+                                   value="{{ form_data.empleados if form_data else '1' }}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tiempo_funcionando">
+                            <i class="fas fa-clock"></i> Tiempo Funcionando
+                        </label>
+                        <select id="tiempo_funcionando" name="tiempo_funcionando">
+                            {% for tiempo in tiempo_opciones %}
+                            <option value="{{ tiempo }}"
+                                    {% if form_data and form_data.tiempo_funcionando == tiempo %}selected{% endif %}>
+                                {{ tiempo }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-navigation">
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary btn-animated" id="btn-prev">
+                        <span class="btn-content">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Anterior</span>
+                        </span>
+                        <div class="btn-shine"></div>
+                    </a>
+                    
+                    <div class="nav-spacer"></div>
+                    
+                    
+                    
+                    <button type="submit" class="btn btn-submit btn-animated" id="btn-submit">
+                        <span class="btn-content">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Registrar</span>
+                        </span>
+                        <div class="btn-shine"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-rocket"></i>
+                <span>EmprendeUni</span>
+            </div>
+            <p>&copy; 2024 EmprendeUni - Impulsando el futuro emprendedor estudiantil</p>
+        </div>
+        <div class="footer-wave">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
+            </svg>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
+    <script src="{{ url_for('static', filename='js/registro.js') }}"></script>
+</body>
+</html>

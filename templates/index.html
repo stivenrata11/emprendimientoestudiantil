@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmprendeUni - Emprendimientos Estudiantiles</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader">
+            <div class="rocket-loader">
+                <i class="fas fa-rocket"></i>
+                <div class="rocket-trail"></div>
+            </div>
+            <div class="loading-text">Cargando EmprendeUni...</div>
+        </div>
+    </div>
+
+
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <span class="logo-text">EmprendeUni</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="{{ url_for('index') }}" class="nav-link active">
+                    <span class="nav-link-text">Inicio</span>
+                    <div class="nav-link-underline"></div>
+                </a>
+                <a href="{{ url_for('registro') }}" class="nav-link">
+                    <span class="nav-link-text">Registrar</span>
+                    <div class="nav-link-underline"></div>
+                </a>
+                <a href="{{ url_for('lista') }}" class="nav-link">
+                    <span class="nav-link-text">Emprendimientos</span>
+                    <div class="nav-link-underline"></div>
+                </a>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div class="hero-bg">
+                <div class="gradient-orb orb-1"></div>
+                <div class="gradient-orb orb-2"></div>
+                <div class="gradient-orb orb-3"></div>
+            </div>
+            
+            <div class="hero-content">
+                
+                <h1 class="hero-title">
+                    <span class="title-line">Impulsa tu</span>
+                    <span class="title-highlight">Emprendimiento</span>
+                    <span class="title-line">Estudiantil</span>
+                </h1>
+                
+                <p class="hero-subtitle">
+                    Conecta, promociona y haz crecer tu emprendimiento universitario 
+                    en la comunidad estudiantil más innovadora del país
+                </p>
+                
+                <div class="hero-buttons">
+                    <a href="{{ url_for('registro') }}" class="btn btn-primary btn-animated">
+                        <span class="btn-content">
+                            <i class="fas fa-plus"></i>
+                            <span>Registrar Emprendimiento</span>
+                        </span>
+                        <div class="btn-shine"></div>
+                    </a>
+                    <a href="{{ url_for('lista') }}" class="btn btn-secondary btn-animated">
+                        <span class="btn-content">
+                            <i class="fas fa-search"></i>
+                            <span>Explorar Emprendimientos</span>
+                        </span>
+                        <div class="btn-shine"></div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator">
+                <div class="scroll-mouse">
+                    <div class="scroll-wheel"></div>
+                </div>
+                <span>Desliza para descubrir</span>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats" id="stats">
+            <div class="stats-container">
+                <div class="stat-item" data-number="{{ total }}">
+                    <div class="stat-number" id="total-emprendimientos">0</div>
+                    <div class="stat-label">Emprendimientos Activos</div>
+                    <div class="stat-icon"><i class="fas fa-rocket"></i></div>
+                </div>
+                <div class="stat-item" data-number="{{ categorias_stats|length }}">
+                    <div class="stat-number" id="total-categorias">0</div>
+                    <div class="stat-label">Categorías Disponibles</div>
+                    <div class="stat-icon"><i class="fas fa-tags"></i></div>
+                </div>
+                <div class="stat-item" data-number="{{ total }}">
+                    <div class="stat-number" id="total-estudiantes">0</div>
+                    <div class="stat-label">Estudiantes Emprendedores</div>
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Emprendimientos -->
+        <section class="emprendimientos-destacados" id="emprendimientos">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="title-background">Emprendimientos</span>
+                    <span class="title-foreground">Destacados</span>
+                </h2>
+                <p class="section-subtitle">
+                    Descubre los proyectos más innovadores de nuestra comunidad estudiantil
+                </p>
+            </div>
+
+            <div class="emprendimientos-grid">
+                {% for emp in emprendimientos %}
+                <div class="emprendimiento-card" data-categoria="{{ emp.categoria }}">
+                    <div class="card-glow"></div>
+                    <div class="card-header">
+                        <span class="categoria-badge">
+                            <i class="fas fa-tag"></i>
+                            {{ emp.categoria }}
+                        </span>
+                        <span class="estado-badge estado-{{ emp.estado.lower().replace(' ', '-') }}">
+                            <div class="estado-dot"></div>
+                            {{ emp.estado }}
+                        </span>
+                    </div>
+                    
+                    <div class="card-content">
+                        <h3 class="card-title">{{ emp.nombre }}</h3>
+                        <p class="card-description">{{ emp.descripcion[:100] }}...</p>
+                        
+                        <div class="card-info">
+                            <div class="info-item">
+                                <i class="fas fa-user"></i>
+                                <span>{{ emp.estudiante_nombre }}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>{{ emp.carrera }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <div class="redes-sociales">
+                            {% if emp.instagram %}
+                                <a href="{{ emp.instagram }}" target="_blank" title="Instagram" class="social-link instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                            {% endif %}
+                            {% if emp.facebook %}
+                                <a href="{{ emp.facebook }}" target="_blank" title="Facebook" class="social-link facebook">
+                                    <i class="fab fa-facebook"></i>
+                                </a>
+                            {% endif %}
+                            {% if emp.whatsapp %}
+                                <a href="https://wa.me/{{ emp.whatsapp }}" target="_blank" title="WhatsApp" class="social-link whatsapp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                        
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if emprendimientos|length == 0 %}
+            <div class="empty-state">
+                <div class="empty-illustration">
+                    <i class="fas fa-rocket"></i>
+                    <div class="illustration-particles">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <h3>¡Sé el primer emprendedor!</h3>
+                <p>Únete a nuestra comunidad y comparte tu proyecto innovador</p>
+                <a href="{{ url_for('registro') }}" class="btn btn-primary btn-animated">
+                    <span class="btn-content">
+                        <i class="fas fa-plus"></i>
+                        <span>Registrar Emprendimiento</span>
+                    </span>
+                    <div class="btn-shine"></div>
+                </a>
+            </div>
+            {% endif %}
+        </section>
+    </main>
+
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/TextPlugin.min.js"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+</body>
+</html>

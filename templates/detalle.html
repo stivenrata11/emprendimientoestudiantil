@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ emprendimiento.nombre }} - EmprendeUni</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detalle.css') }}">
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader">
+            <div class="rocket-loader">
+                <i class="fas fa-rocket"></i>
+                <div class="rocket-trail"></div>
+            </div>
+            <div class="loading-text">Cargando detalles...</div>
+        </div>
+    </div>
+
+    <!-- Floating Elements -->
+    <div class="floating-elements">
+        <div class="floating-element" style="--delay: 0s; --duration: 20s;">📝</div>
+        <div class="floating-element" style="--delay: 5s; --duration: 25s;">📊</div>
+        <div class="floating-element" style="--delay: 10s; --duration: 30s;">💡</div>
+        <div class="floating-element" style="--delay: 15s; --duration: 22s;">🚀</div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <span class="logo-text">EmprendeUni</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="{{ url_for('index') }}" class="nav-link">
+                    <span class="nav-link-text">Inicio</span>
+                    <div class="nav-link-underline"></div>
+                </a>
+                <a href="{{ url_for('registro') }}" class="nav-link active">
+                    <span class="nav-link-text">Registrar</span>
+                    <div class="nav-link-underline"></div>
+                </a>
+                <a href="{{ url_for('lista') }}" class="nav-link">
+                    <span class="nav-link-text">Emprendimientos</span>
+                    <div class="nav-link-underline"></div>
+                </a>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="breadcrumb">
+            <a href="{{ url_for('index') }}">Inicio</a>
+            <span>/</span>
+            <a href="{{ url_for('lista') }}">Emprendimientos</a>
+            <span>/</span>
+            <span>{{ emprendimiento.nombre }}</span>
+        </div>
+
+        <div class="detalle-container">
+            <div class="detalle-header">
+                <div class="header-info">
+                    <div class="badges">
+                        <span class="categoria-badge">{{ emprendimiento.categoria }}</span>
+                        <span class="estado-badge estado-{{ emprendimiento.estado.lower().replace(' ', '-') }}">
+                            {{ emprendimiento.estado }}
+                        </span>
+                    </div>
+                    <h1>{{ emprendimiento.nombre }}</h1>
+                    <p class="descripcion">{{ emprendimiento.descripcion }}</p>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="btn btn-outline" onclick="compartir()">
+                        <i class="fas fa-share"></i> Compartir
+                    </button>
+                    {% if emprendimiento.whatsapp %}
+                    <a href="https://wa.me/{{ emprendimiento.whatsapp }}" target="_blank" class="btn btn-primary">
+                        <i class="fab fa-whatsapp"></i> Contactar
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="detalle-content">
+                <div class="info-principal">
+                    <div class="info-section">
+                        <h2><i class="fas fa-user-graduate"></i> Información del Emprendedor</h2>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Nombre:</label>
+                                <span>{{ emprendimiento.estudiante_nombre }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Email:</label>
+                                <span>{{ emprendimiento.email }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Teléfono:</label>
+                                <span>{{ emprendimiento.telefono }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Universidad:</label>
+                                <span>{{ emprendimiento.universidad }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Carrera:</label>
+                                <span>{{ emprendimiento.carrera }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Semestre:</label>
+                                <span>{{ emprendimiento.semestre }}° Semestre</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h2><i class="fas fa-chart-line"></i> Información del Negocio</h2>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Tiempo funcionando:</label>
+                                <span>{{ emprendimiento.tiempo_funcionando }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Número de empleados:</label>
+                                <span>{{ emprendimiento.empleados }}</span>
+                            </div>
+                            {% if emprendimiento.inversion_inicial > 0 %}
+                            <div class="info-item">
+                                <label>Inversión inicial:</label>
+                                <span>S/. {{ "%.2f"|format(emprendimiento.inversion_inicial) }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="info-item">
+                                <label>Fecha de registro:</label>
+                                <span>{{ emprendimiento.fecha_registro[:10] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="redes-sociales-card">
+                        <h3><i class="fas fa-share-alt"></i> Redes Sociales</h3>
+                        <div class="redes-list">
+                            {% if emprendimiento.instagram %}
+                            <a href="{{ emprendimiento.instagram }}" target="_blank" class="red-social instagram">
+                                <i class="fab fa-instagram"></i>
+                                <span>Instagram</span>
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% if emprendimiento.facebook %}
+                            <a href="{{ emprendimiento.facebook }}" target="_blank" class="red-social facebook">
+                                <i class="fab fa-facebook"></i>
+                                <span>Facebook</span>
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% if emprendimiento.tiktok %}
+                            <a href="{{ emprendimiento.tiktok }}" target="_blank" class="red-social tiktok">
+                                <i class="fab fa-tiktok"></i>
+                                <span>TikTok</span>
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% if emprendimiento.whatsapp %}
+                            <a href="https://wa.me/{{ emprendimiento.whatsapp }}" target="_blank" class="red-social whatsapp">
+                                <i class="fab fa-whatsapp"></i>
+                                <span>WhatsApp</span>
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% if emprendimiento.sitio_web %}
+                            <a href="{{ emprendimiento.sitio_web }}" target="_blank" class="red-social web">
+                                <i class="fas fa-globe"></i>
+                                <span>Sitio Web</span>
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+
+                        {% if not (emprendimiento.instagram or emprendimiento.facebook or emprendimiento.tiktok or emprendimiento.whatsapp or emprendimiento.sitio_web) %}
+                        <p class="no-redes">No hay redes sociales disponibles</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="contacto-card">
+                        <h3><i class="fas fa-envelope"></i> Contacto Directo</h3>
+                        <a href="mailto:{{ emprendimiento.email }}" class="btn btn-outline">
+                            <i class="fas fa-envelope"></i> Enviar Email
+                        </a>
+                        {% if emprendimiento.telefono %}
+                        <a href="tel:{{ emprendimiento.telefono }}" class="btn btn-outline">
+                            <i class="fas fa-phone"></i> Llamar
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-rocket"></i>
+                <span>EmprendeUni</span>
+            </div>
+            <p>&copy; 2024 EmprendeUni - Impulsando el futuro emprendedor estudiantil</p>
+        </div>
+        <div class="footer-wave">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
+            </svg>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/detalle.js') }}"></script>
+</body>
+</html>

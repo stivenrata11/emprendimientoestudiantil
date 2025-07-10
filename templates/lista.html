@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emprendimientos - EmprendeUni</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lista.css') }}">
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader">
+            <div class="rocket-loader">
+                <i class="fas fa-rocket"></i>
+                <div class="rocket-trail"></div>
+            </div>
+            <div class="loading-text">Cargando Lista...</div>
+        </div>
+    </div>
+
+    <!-- Floating Elements -->
+    <div class="floating-elements">
+        <div class="floating-element" style="--delay: 0s; --duration: 20s;">📝</div>
+        <div class="floating-element" style="--delay: 5s; --duration: 25s;">📊</div>
+        <div class="floating-element" style="--delay: 10s; --duration: 30s;">💡</div>
+        <div class="floating-element" style="--delay: 15s; --duration: 22s;">🚀</div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <span class="logo-text">EmprendeUni</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="{{ url_for('index') }}" class="nav-link">
+                    <span class="nav-link-text">Inicio</span>
+                    <div class="nav-link-underline"></div>
+                </a>
+                <a href="{{ url_for('registro') }}" class="nav-link active">
+                    <span class="nav-link-text">Registrar</span>
+                    <div class="nav-link-underline"></div>
+                </a>
+                <a href="{{ url_for('lista') }}" class="nav-link">
+                    <span class="nav-link-text">Emprendimientos</span>
+                    <div class="nav-link-underline"></div>
+                </a>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1><i class="fas fa-list"></i> Emprendimientos Estudiantiles</h1>
+            <p>Descubre todos los emprendimientos registrados</p>
+        </div>
+
+        <!-- Filtros y Búsqueda -->
+        <div class="filters-section">
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Buscar emprendimientos..." 
+                           value="{{ busqueda_actual }}">
+                </div>
+                <button type="button" class="btn btn-primary" onclick="aplicarFiltros()">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+
+            <div class="filter-container">
+                <label for="categoria-filter">Filtrar por categoría:</label>
+                <select id="categoria-filter" onchange="aplicarFiltros()">
+                    <option value="">Todas las categorías</option>
+                    {% for cat in categorias %}
+                    <option value="{{ cat }}" {% if categoria_actual == cat %}selected{% endif %}>
+                        {{ cat }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="results-info">
+                <span id="results-count">{{ emprendimientos|length }}</span> emprendimientos encontrados
+            </div>
+        </div>
+
+        <!-- Grid de Emprendimientos -->
+        <div class="emprendimientos-container">
+            {% if emprendimientos|length > 0 %}
+            <div class="emprendimientos-grid" id="emprendimientos-grid">
+                {% for emp in emprendimientos %}
+                <div class="emprendimiento-card" data-categoria="{{ emp.categoria }}" 
+                     data-nombre="{{ emp.nombre.lower() }}" 
+                     data-descripcion="{{ emp.descripcion.lower() }}"
+                     data-estudiante="{{ emp.estudiante_nombre.lower() }}">
+                    
+                    <div class="card-header">
+                        <span class="categoria-badge">{{ emp.categoria }}</span>
+                        <span class="estado-badge estado-{{ emp.estado.lower().replace(' ', '-') }}">
+                            {{ emp.estado }}
+                        </span>
+                    </div>
+
+                    <div class="card-body">
+                        <h3 class="card-title">{{ emp.nombre }}</h3>
+                        <p class="card-description">{{ emp.descripcion[:150] }}...</p>
+                        
+                        <div class="card-info">
+                            <div class="info-item">
+                                <i class="fas fa-user"></i>
+                                <span>{{ emp.estudiante_nombre }}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>{{ emp.carrera }}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-university"></i>
+                                <span>{{ emp.universidad }}</span>
+                            </div>
+                            {% if emp.inversion_inicial > 0 %}
+                            <div class="info-item">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>S/. {{ "%.2f"|format(emp.inversion_inicial) }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="redes-sociales">
+                            {% if emp.instagram %}
+                                <a href="{{ emp.instagram }}" target="_blank" title="Instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                            {% endif %}
+                            {% if emp.facebook %}
+                                <a href="{{ emp.facebook }}" target="_blank" title="Facebook">
+                                    <i class="fab fa-facebook"></i>
+                                </a>
+                            {% endif %}
+                            {% if emp.whatsapp %}
+                                <a href="https://wa.me/{{ emp.whatsapp }}" target="_blank" title="WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            {% endif %}
+                            {% if emp.sitio_web %}
+                                <a href="{{ emp.sitio_web }}" target="_blank" title="Sitio Web">
+                                    <i class="fas fa-globe"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                        
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <h3>No se encontraron emprendimientos</h3>
+                <p>No hay emprendimientos que coincidan con los filtros seleccionados.</p>
+                <a href="{{ url_for('lista') }}" class="btn btn-secondary">Ver Todos</a>
+                <a href="{{ url_for('registro') }}" class="btn btn-primary">Registrar Emprendimiento</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-rocket"></i>
+                <span>EmprendeUni</span>
+            </div>
+            <p>&copy; 2024 EmprendeUni - Impulsando el futuro emprendedor estudiantil</p>
+        </div>
+        <div class="footer-wave">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
+            </svg>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/lista.js') }}"></script>
+</body>
+</html>
